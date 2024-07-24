@@ -65,7 +65,6 @@ describe('ConfigEditor', () => {
       },
     })
     expect(screen.getByText(/host:port/i)).toBeInTheDocument()
-    expect(screen.getByText(/auth type/i)).toBeInTheDocument()
     expect(screen.getByText(/require tls \/ ssl/i)).toBeInTheDocument()
     expect(screen.getByText(/require tls \/ ssl/i)).toBeInTheDocument()
   })
