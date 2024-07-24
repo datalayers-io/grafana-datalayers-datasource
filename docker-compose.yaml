@@ -1,0 +1,13 @@
+version: '3.0'
+
+services:
+  grafana:
+    container_name: 'grafana-datasource-datalayers'
+    build:
+      context: ./.config
+      args:
+        grafana_version: ${GRAFANA_VERSION:-9.4.7}
+    ports:
+      - 3344:3000/tcp
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/grafana-datasource-datalayers

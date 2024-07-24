@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "Datalayers",
+  "id": "grafana-datalayers-datasource",
+  "metrics": true,
+  "backend": true,
+  "alerting": true,
+  "executable": "gpx_grafana_datalayers_datasource",
+  "info": {
+    "description": "Grafana datasource for Datalayers.",
+    "author": {
+      "name": "datalayers-io",
+      "url": "https://datalayers.io"
+    },
+    "keywords": ["datasource", "apache", "arrow", "flight", "flightsql"],
+    "logos": {
+      "small": "img/logo.png",
+      "large": "img/logo.png"
+    },
+    "links": [
+      {
+        "name": "Github",
+        "url": "https://github.com/datalayers-io/grafana-datalayers-datasource"
+      },
+      {
+        "name": "Docs",
+        "url": "https://github.com/datalayers-io/grafana-datalayers-datasource/blob/main/README.md"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/datalayers-io/grafana-datalayers-datasource/blob/main/LICENSE"
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "Config Data Source",
+        "path": "img/configuration.png"
+      }
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=9.2.5",
+    "plugins": []
+  }
+}
