@@ -81,7 +81,7 @@ echo "The latest release tag of $REPO_NAME is: $LATEST_RELEASE_TAG"
 
 # Install plugin by grafana cli
 echo "Installing grafana plugin: datalayers..."
-grafana cli --pluginsDir "$PWD/plugins" --pluginUrl https://github.com/datalayers-io/grafana-datalayers-datasource/releases/download/$LATEST_RELEASE_TAG/datalayers-$VERSION.zip plugins install datalayers
+grafana cli --pluginsDir "$PWD/plugins" --pluginUrl https://github.com/datalayers-io/grafana-datalayers-datasource/releases/download/$LATEST_RELEASE_TAG/grafana-datalayers-datasource-$VERSION.zip plugins install datalayers
 
 echo -e "
 Please run the following command at your grafana homepath. It is usually located in /usr/share/grafana.\n

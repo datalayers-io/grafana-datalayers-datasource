@@ -55,33 +55,30 @@ export function ConfigEditor(props: DataSourcePluginOptionsEditorProps<FlightSQL
             onChange={(e) => onHostChange(e, options, onOptionsChange)}
           ></Input>
         </InlineField>
-        {selectedAuthType?.label === 'username/password' && (
-        <>
-          <InlineField labelWidth={20} label="Username">
-            <Input
-              width={40}
-              name="username"
-              type="text"
-              placeholder="username"
-              onChange={(e) => onUsernameChange(e, options, onOptionsChange)}
-              value={jsonData.username || ''}
-            ></Input>
-          </InlineField>
-          <InlineField labelWidth={20} label="Password">
-            <SecretInput
-              width={40}
-              name="password"
-              type="text"
-              value={secureJsonData?.password || ''}
-              placeholder="****************"
-              onChange={(e) => onPasswordChange(e, options, onOptionsChange)}
-              onReset={() => onResetPassword(options, onOptionsChange)}
-              isConfigured={secureJsonFields?.password}
-            ></SecretInput>
-          </InlineField>
-        </>
-        )}
 
+        <InlineField labelWidth={20} label="Username">
+          <Input
+            width={40}
+            name="username"
+            type="text"
+            placeholder="username"
+            onChange={(e) => onUsernameChange(e, options, onOptionsChange)}
+            value={jsonData.username || ''}
+          ></Input>
+        </InlineField>
+        <InlineField labelWidth={20} label="Password">
+          <SecretInput
+            width={40}
+            name="password"
+            type="text"
+            value={secureJsonData?.password || ''}
+            placeholder="****************"
+            onChange={(e) => onPasswordChange(e, options, onOptionsChange)}
+            onReset={() => onResetPassword(options, onOptionsChange)}
+            isConfigured={secureJsonFields?.password}
+          ></SecretInput>
+        </InlineField>
+        
         <InlineField labelWidth={20} label="Require TLS / SSL">
           <InlineSwitch
             label=""
