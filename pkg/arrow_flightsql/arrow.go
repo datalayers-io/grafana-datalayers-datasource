@@ -126,62 +126,60 @@ func newDataField[T any](f arrow.Field) *data.Field {
 	return data.NewField(f.Name, nil, s)
 }
 
-func copyData(field *data.Field, col arrow.Array) error {
-	defer recoverFromPanic()
+func cloneData(field *data.Field, col arrow.Array) error {
+	defer func() {
+		if r := recover(); r != nil {
+			logErrorf("Panic: %s %s", r, string(debug.Stack()))
+		}
+	}()
 
 	data := col.Data()
+
 	switch col.DataType().ID() {
 	case arrow.TIMESTAMP:
-		return copyTimestampData(field, array.NewTimestampData(data))
+		v := array.NewTimestampData(data)
+		unit := getTimeUnit(col)
+		for i := 0; i < v.Len(); i++ {
+			if field.Nullable() {
+				if v.IsNull(i) {
+					var t *time.Time
+					field.Append(t)
+					continue
+				}
+				t := v.Value(i).ToTime(unit)
+				field.Append(&t)
+				continue
+			}
+			field.Append(v.Value(i).ToTime(unit))
+		}
 	case arrow.DENSE_UNION:
-		return copyDenseUnionData(field, array.NewDenseUnionData(data))
-	default:
-		return copyBasicData(field, data)
-	}
-}
+		v := array.NewDenseUnionData(data)
+		for i := 0; i < v.Len(); i++ {
+			sc, err := scalar.GetScalar(v, i)
+			if err != nil {
+				return err
+			}
+			value := sc.(*scalar.DenseUnion).ChildValue()
 
-func copyTimestampData(field *data.Field, data *array.Timestamp) error {
-	for i := 0; i < data.Len(); i++ {
-		if appendNullableTime(field, data, i) {
-			continue
+			var data any
+			switch value.DataType().ID() {
+			case arrow.STRING:
+				data = value.(*scalar.String).String()
+			case arrow.BOOL:
+				data = value.(*scalar.Boolean).Value
+			case arrow.INT32:
+				data = value.(*scalar.Int32).Value
+			case arrow.INT64:
+				data = value.(*scalar.Int64).Value
+			case arrow.LIST:
+				data = value.(*scalar.List).Value
+			}
+			b, err := json.Marshal(data)
+			if err != nil {
+				return err
+			}
+			field.Append(json.RawMessage(b))
 		}
-		field.Append(data.Value(i).ToTime(arrow.Nanosecond))
-	}
-	return nil
-}
-
-func copyDenseUnionData(field *data.Field, data *array.DenseUnion) error {
-	for i := 0; i < data.Len(); i++ {
-		sc, err := scalar.GetScalar(data, i)
-		if err != nil {
-			return err
-		}
-		value := sc.(*scalar.DenseUnion).ChildValue()
-
-		var jsonData any
-		switch value.DataType().ID() {
-		case arrow.STRING:
-			jsonData = value.(*scalar.String).String()
-		case arrow.BOOL:
-			jsonData = value.(*scalar.Boolean).Value
-		case arrow.INT32:
-			jsonData = value.(*scalar.Int32).Value
-		case arrow.INT64:
-			jsonData = value.(*scalar.Int64).Value
-		case arrow.LIST:
-			jsonData = value.(*scalar.List).Value
-		}
-		b, err := json.Marshal(jsonData)
-		if err != nil {
-			return err
-		}
-		field.Append(json.RawMessage(b))
-	}
-	return nil
-}
-
-func copyBasicData(field *data.Field, data arrow.ArrayData) error {
-	switch data.DataType().ID() {
 	case arrow.STRING:
 		copyBasic[string](field, array.NewStringData(data))
 	case arrow.UINT8:
@@ -209,7 +207,17 @@ func copyBasicData(field *data.Field, data arrow.ArrayData) error {
 	case arrow.DURATION:
 		copyBasic[int64](field, array.NewInt64Data(data))
 	}
+
 	return nil
+}
+
+func getTimeUnit(col arrow.Array) arrow.TimeUnit {
+	switch t := col.DataType().(type) {
+	case *arrow.TimestampType:
+		return t.TimeUnit()
+	default:
+		return arrow.Nanosecond
+	}
 }
 
 type arrowArray[T any] interface {
@@ -242,7 +250,7 @@ func recoverFromPanic() {
 
 func appendRecordToFrame(frame *data.Frame, record arrow.Record) error {
 	for i, col := range record.Columns() {
-		if err := copyData(frame.Fields[i], col); err != nil {
+		if err := cloneData(frame.Fields[i], col); err != nil {
 			return err
 		}
 	}
