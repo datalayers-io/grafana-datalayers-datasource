@@ -179,7 +179,7 @@ READER:
 	for reader.Next() {
 		record := reader.Record()
 		for i, col := range record.Columns() {
-			if err := copyData(frame.Fields[i], col); err != nil {
+			if err := cloneData(frame.Fields[i], col); err != nil {
 				resp.Error = err
 				break READER
 			}
