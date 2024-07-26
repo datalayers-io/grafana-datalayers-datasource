@@ -14,10 +14,6 @@ do
   esac
 done
 
-echo $HOST;
-echo $USERNAME;
-echo $PASSWORD;
-
 # Make grafana custom.ini to current directory
 tee custom.ini > /dev/null << EOF
 [paths]
@@ -25,7 +21,7 @@ plugins = $PWD/plugins
 provisioning = $PWD/provisioning
 
 [plugins]
-allow_loading_unsigned_plugins = datalayers
+allow_loading_unsigned_plugins = grafana-datalayers-datasource
 EOF
 echo "Generated custom.ini"
 
@@ -35,11 +31,11 @@ mkdir -p provisioning/dashboards
 mkdir -p provisioning/plugins
 mkdir -p provisioning/notifiers
 mkdir -p provisioning/alerting
-tee provisioning/datasources/datalayers.yaml > /dev/null << EOF
+tee provisioning/datasources/grafana-datalayers-datasource.yaml > /dev/null << EOF
 apiVersion: 1
 datasources:
   - name: Datalayers
-    type: datalayers
+    type: grafana-datalayers-datasource
     orgId: 1
     url: http://$HOST
     jsonData:
@@ -51,7 +47,7 @@ datasources:
     version: 1
     editable: true
 EOF
-echo "Generated provisioning/datasources/datalayers.yaml"
+echo "Generated provisioning/datasources/grafana-datalayers-datasource.yaml"
 
 
 # Set repository information
@@ -80,9 +76,9 @@ echo "The latest release tag of $REPO_NAME is: $LATEST_RELEASE_TAG"
 
 
 # Install plugin by grafana cli
-echo "Installing grafana plugin: datalayers..."
-grafana cli --pluginsDir "$PWD/plugins" --pluginUrl https://github.com/datalayers-io/grafana-datalayers-datasource/releases/download/$LATEST_RELEASE_TAG/grafana-datalayers-datasource-$VERSION.zip plugins install datalayers
+echo "Installing grafana plugin: grafana-datalayers-datasource"
+grafana cli --pluginsDir "$PWD/plugins" --pluginUrl https://github.com/datalayers-io/grafana-datalayers-datasource/releases/download/$LATEST_RELEASE_TAG/grafana-datalayers-datasource-$VERSION.zip plugins install grafana-datalayers-datasource
 
 echo -e "
-Please run the following command at your grafana homepath. It is usually located in /usr/share/grafana.\n
+Please run the following command at your grafana homepath.\n
 grafana server --config $PWD/custom.ini"
