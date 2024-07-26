@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable --prefer-offline
 
-      - name: Build and test frontend
+      - name: Build
         run: yarn build
 
       - name: Check for backend
