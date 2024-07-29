@@ -1,9 +1,7 @@
 import React from 'react'
 
-import {Alert} from '@grafana/ui'
-
 export const QueryHelp = () => (
-  <Alert title="Query Help" severity="info">
+  <div style={{padding: '10px 0'}}>
     <div>
       <h3>Format Options:</h3>
       <h4>Table(default):</h4>
@@ -15,7 +13,7 @@ export const QueryHelp = () => (
     <div>
       <h3>Supported Macros:</h3>
       <li>
-        $__dateBin(time) -&gt; date_bin(interval &apos;30 second&apos;, time, timestamp
+        $__dateBin(time) -&gt; date_bin(interval &apos;30 seconds&apos;, time, timestamp
         &apos;1970-01-01T00:00:00Z&apos;)
       </li>
       <li>
@@ -45,5 +43,5 @@ export const QueryHelp = () => (
       <li> $__timeRangeTo(time) -&gt; time &lt;= &apos;2023-01-01T01:00:00Z&apos;</li>
       <li>$__timeTo(time) -&gt; cast(time as timestamp)</li>
     </div>
-  </Alert>
+  </div>
 )

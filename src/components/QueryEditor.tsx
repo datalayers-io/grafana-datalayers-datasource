@@ -1,5 +1,5 @@
 import React, {useState, useMemo, useCallback, useEffect} from 'react'
-import {Button, Modal, SegmentSection, Select, InlineFieldRow, SegmentInput} from '@grafana/ui'
+import {Button, Modal, SegmentSection, Select, InlineFieldRow, SegmentInput, Drawer} from '@grafana/ui'
 import {QueryEditorProps, SelectableValue} from '@grafana/data'
 import {MacroType} from '@grafana/experimental'
 import {FlightSQLDataSource} from '../datasource'
@@ -13,7 +13,7 @@ import {QueryHelp} from './QueryHelp'
 export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuery, FlightSQLDataSourceOptions>) {
   const {onChange, query, datasource} = props
   const [warningModal, showWarningModal] = useState(false)
-  const [helpModal, showHelpModal] = useState(false)
+  const [helpVisible, setHelpVisible] = useState(false)
   const [sqlInfo, setSqlInfo] = useState<any>()
   const [macros, setMacros] = useState<any>()
   const [rawEditor, setRawEditor] = useState<any>(false)
@@ -29,7 +29,7 @@ export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuer
       const systemFunctions = res?.frames[0].data.values[1][20] || []
       const sqlDateTimeFunctions = res?.frames[0].data.values[1][21] || []
       const functions = [...numericFunctions, ...stringFunctions, ...systemFunctions, ...sqlDateTimeFunctions]
-      setSqlInfo({keywords: keywords, builtinFunctions: functions})
+      setSqlInfo({keywords: keywords, builtinFunctions: functions || []})
     })()
   }, [datasource])
 
@@ -38,7 +38,7 @@ export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuer
       const res = await datasource.getMacros()
       const prefix = `$__`
       const macroArr = res?.macros.map((m: any) => prefix.concat(m))
-      const macros = macroArr.map((m: any) => ({text: m, name: m, id: m, type: MacroType.Value, args: []}))
+      const macros = macroArr.map((m: any) => ({text: m, name: m, id: m, type: MacroType.Value, args: []}));
       setMacros(macros)
     })()
   }, [datasource])
@@ -109,6 +109,13 @@ export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuer
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const showHelp = () => {
+    setHelpVisible(true)
+  }
+  const hideHelp = () => {
+    setHelpVisible(false);
+  }
+
   return (
     <>
       {warningModal && (
@@ -172,7 +179,7 @@ export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuer
           <Button style={{marginLeft: '5px'}} fill="outline" size="md" onClick={() => showWarningModal(!warningModal)}>
             {rawEditor ? 'Builder View' : 'Edit SQL'}
           </Button>
-          <Button style={{marginLeft: '5px'}} fill="outline" size="md" onClick={() => showHelpModal(!helpModal)}>
+          <Button style={{marginLeft: '5px'}} fill="outline" size="md" onClick={showHelp}>
             Show Query Help
           </Button>
         </InlineFieldRow>
@@ -186,7 +193,7 @@ export function QueryEditor(props: QueryEditorProps<FlightSQLDataSource, SQLQuer
           </SegmentSection>{' '}
         </div>
       )}
-      {helpModal && <QueryHelp />}
+      {helpVisible && <Drawer title="Query Help" onClose={hideHelp} closeOnMaskClick={true}><QueryHelp /></Drawer>}
     </>
   )
 }

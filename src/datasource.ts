@@ -63,7 +63,39 @@ toMetricFindValue(rsp: DataQueryResponse): MetricFindValue[] {
     return value
   }
 
+  replaceTimeUnit(timeText: String) {
+    const replaced = timeText.replace(/(\d+)(ms|s|m|h|d)/g, (match, p1, p2) => {
+      switch (p2) {
+        case 'ms':
+          return `${p1} milliseconds`;
+        case 's':
+          return `${p1} seconds`;
+        case 'm':
+          return `${p1} minutes`;
+        case 'h':
+          return `${p1} hours`;
+        case 'd':
+          return `${p1} days`;
+        default:
+          return match;
+      }
+    });
+    console.log('replaced', replaced);
+    return replaced;
+  }
+
+  overrideGrafanaVars(scopedVars: ScopedVars) {
+    // Replace time unit to match Datalayers
+    if (scopedVars.__interval.text) {
+      const v = this.replaceTimeUnit(scopedVars.__interval.value);
+      scopedVars.__interval.value = v;
+    }
+    
+    return scopedVars;
+  }
+
   applyTemplateVariables(query: SQLQuery, scopedVars: ScopedVars): Record<string, any> {
+    this.overrideGrafanaVars(scopedVars);
     const interpolatedQuery: SQLQuery = {
       ...query,
       queryText: getTemplateSrv().replace(query.queryText, scopedVars, this.interpolateVariable),
