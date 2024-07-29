@@ -1,6 +1,6 @@
 {
   "name": "grafana-datalayers-datasource",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Datalayers datasource plugin for grafana",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
