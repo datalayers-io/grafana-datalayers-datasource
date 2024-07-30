@@ -42,12 +42,12 @@ func (d *DataSource) QueryData(ctx context.Context, req *backend.QueryDataReques
 			continue
 		}
 		// Check query.RawSQL, An empty query returns an empty array
-    if query.RawSQL == "" {
-      response.Responses[dataQuery.RefID] = backend.DataResponse{
-        Frames: []*data.Frame{},
-      }
-      continue
-    }
+		if query.RawSQL == "" {
+			response.Responses[dataQuery.RefID] = backend.DataResponse{
+				Frames: []*data.Frame{},
+		}
+			continue
+		}
 
 		wg.Add(1)
 		go d.executeQuery(ctx, query, executeResults, &wg)
