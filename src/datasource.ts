@@ -80,7 +80,6 @@ toMetricFindValue(rsp: DataQueryResponse): MetricFindValue[] {
           return match;
       }
     });
-    console.log('replaced', replaced);
     return replaced;
   }
 
