@@ -20,5 +20,5 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
-      - ./dist:/var/lib/grafana/plugins/grafana-datasource-datalayers
+      - ./dist:/var/lib/grafana/plugins/datalayersio-datasource
       - ./provisioning/datasources/datalayers.yml:/etc/grafana/provisioning/datasources/datalayers.yaml

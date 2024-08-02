@@ -32,7 +32,7 @@ GF_PATHS_PLUGINS=custom/plugins/directory/
 
 ```
 docker run \
-  -v $PWD/grafana-datalayers-datasource:/custom/plugins/directory/grafana-datalayers-datasource \
+  -v $PWD/datalayersio-datasource:/custom/plugins/directory/datalayersio-datasource \
   -p 3000:3000 \
   --name grafana \
   grafana/grafana:latest
@@ -47,7 +47,7 @@ services:
     ports:
       - 3000:3000
     volumes: 
-      - ./grafana-datalayers-datasource:/custom/plugins/directory/grafana-datalayers-datasource
+      - ./datalayersio-datasource:/custom/plugins/directory/datalayersio-datasource
 ```
 
 ## Usage

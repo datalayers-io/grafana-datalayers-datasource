@@ -1,9 +1,9 @@
 apiVersion: 1
 datasources:
   - name: Datalayers
-    type: grafana-datalayers-datasource
+    type: datalayersio-datasource
     orgId: 1
-    uid: 'grafana-datalayers-datasource'
+    uid: 'datalayersio-datasource'
     jsonData:
       host: 'your_host_ip:8360'
       selectedAuthType: 'username/password'

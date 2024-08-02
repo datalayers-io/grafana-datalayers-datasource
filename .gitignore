@@ -33,4 +33,4 @@ e2e-results/
 
 .eslintcache
 
-grafana-datalayers-datasource*.tar.gz
+datalayersio-datasource*.tar.gz

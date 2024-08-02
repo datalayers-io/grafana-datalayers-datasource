@@ -12,13 +12,13 @@ export const mockDatasource = new FlightSQLDataSource({
   jsonData: {},
   access: 'proxy',
   meta: {
-    id: 'grafana-datalayers-datasource',
+    id: 'datalayersio-datasource',
     module: '',
     name: 'FlightSQL Data Source',
     type: PluginType.datasource,
     alerting: true,
     backend: true,
-    baseUrl: 'public/plugins/grafana-datalayers-datasource',
+    baseUrl: 'public/plugins/datalayersio-datasource',
     info: {
       description: '',
       screenshots: [],

@@ -21,7 +21,7 @@ plugins = $PWD/plugins
 provisioning = $PWD/provisioning
 
 [plugins]
-allow_loading_unsigned_plugins = grafana-datalayers-datasource
+allow_loading_unsigned_plugins = datalayersio-datasource
 EOF
 echo "Generated custom.ini"
 
@@ -31,11 +31,11 @@ mkdir -p provisioning/dashboards
 mkdir -p provisioning/plugins
 mkdir -p provisioning/notifiers
 mkdir -p provisioning/alerting
-tee provisioning/datasources/grafana-datalayers-datasource.yaml > /dev/null << EOF
+tee provisioning/datasources/datalayersio-datasource.yaml > /dev/null << EOF
 apiVersion: 1
 datasources:
   - name: Datalayers
-    type: grafana-datalayers-datasource
+    type: datalayersio-datasource
     orgId: 1
     url: http://$HOST
     jsonData:
@@ -47,7 +47,7 @@ datasources:
     version: 1
     editable: true
 EOF
-echo "Generated provisioning/datasources/grafana-datalayers-datasource.yaml"
+echo "Generated provisioning/datasources/datalayersio-datasource.yaml"
 
 
 # Set repository information
