@@ -1,0 +1,17 @@
+apiVersion: 1
+datasources:
+  - name: Datalayers
+    type: grafana-datalayers-datasource
+    orgId: 1
+    uid: 'grafana-datalayers-datasource'
+    jsonData:
+      host: 'your_host_ip:8360'
+      selectedAuthType: 'username/password'
+      username: 'admin'
+      metadata:
+        - database: 'demo'
+    secureJsonData:
+      password: 'public'
+    version: 1
+    editable: true
+    isDefault: true

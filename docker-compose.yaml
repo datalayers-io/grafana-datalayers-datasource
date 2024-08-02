@@ -1,13 +1,24 @@
 version: '3.0'
 
 services:
+  datalayers:
+    container_name: datalayers-for-plugin
+    image: datalayers/datalayers:latest
+    ports:
+      - 8360:8360
+      - 8361:8361
+    environment:
+      - DATALAYERS_SERVER__AUTH__USERNAME=admin
+      - DATALAYERS_SERVER__AUTH__PASSWORD=public
+
   grafana:
     container_name: 'grafana-datasource-datalayers'
     build:
       context: ./.config
       args:
-        grafana_version: ${GRAFANA_VERSION:-9.4.7}
+        grafana_version: ${GRAFANA_VERSION:-11.1.1}
     ports:
       - 3000:3000/tcp
     volumes:
       - ./dist:/var/lib/grafana/plugins/grafana-datasource-datalayers
+      - ./provisioning/datasources/datalayers.yml:/etc/grafana/provisioning/datasources/datalayers.yaml
