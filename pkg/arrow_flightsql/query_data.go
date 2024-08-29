@@ -3,6 +3,7 @@ package arrow_flightsql
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -45,7 +46,7 @@ func (d *DataSource) QueryData(ctx context.Context, req *backend.QueryDataReques
 		if query.RawSQL == "" {
 			response.Responses[dataQuery.RefID] = backend.DataResponse{
 				Frames: []*data.Frame{},
-		}
+			}
 			continue
 		}
 
@@ -66,7 +67,7 @@ func (d *DataSource) QueryData(ctx context.Context, req *backend.QueryDataReques
 func decodeQueryRequest(dataQuery backend.DataQuery) (*sqlutil.Query, error) {
 	var q queryRequest
 	if err := json.Unmarshal(dataQuery.JSON, &q); err != nil {
-		return nil, fmt.Errorf("unmarshal json: %w", err)
+		return nil, errors.Join(errors.New("decodeQueryRequest Unmarshal"), err)
 	}
 
 	format := formatQueryOptionFromString(q.Format)
@@ -81,7 +82,7 @@ func decodeQueryRequest(dataQuery backend.DataQuery) (*sqlutil.Query, error) {
 
 	sql, err := sqlutil.Interpolate(query, macros)
 	if err != nil {
-		return nil, fmt.Errorf("interpolate macros: %w", err)
+		return nil, errors.Join(errors.New("decodeQueryRequest Interpolate"), err)
 	}
 	query.RawSQL = sql
 
@@ -112,14 +113,14 @@ func (d *DataSource) query(ctx context.Context, query sqlutil.Query) (response b
 
 	info, err := d.client.Execute(ctx, query.RawSQL)
 	if err != nil {
-		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("flightsql: %s", err))
+		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error: %s", err))
 	}
 	if len(info.Endpoint) != 1 {
 		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("unsupported endpoint count in response: %d", len(info.Endpoint)))
 	}
 	reader, err := d.client.DoGetWithHeaderExtraction(ctx, info.Endpoint[0].Ticket)
 	if err != nil {
-		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("flightsql: %s", err))
+		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error: %s", err))
 	}
 	defer reader.Release()
 
