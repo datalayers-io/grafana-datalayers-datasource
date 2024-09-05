@@ -113,14 +113,14 @@ func (d *DataSource) query(ctx context.Context, query sqlutil.Query) (response b
 
 	info, err := d.client.Execute(ctx, query.RawSQL)
 	if err != nil {
-		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error: %s", err))
+		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error:\n%s", err))
 	}
 	if len(info.Endpoint) != 1 {
 		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("unsupported endpoint count in response: %d", len(info.Endpoint)))
 	}
 	reader, err := d.client.DoGetWithHeaderExtraction(ctx, info.Endpoint[0].Ticket)
 	if err != nil {
-		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error: %s", err))
+		return backend.ErrDataResponse(backend.StatusInternal, fmt.Sprintf("FlightSQL Error:\n%s", err))
 	}
 	defer reader.Release()
 
