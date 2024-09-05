@@ -3,7 +3,6 @@ package arrow_flightsql
 import (
 	"context"
 	"crypto/x509"
-	"errors"
 	"fmt"
 	"sync"
 
@@ -21,7 +20,7 @@ import (
 func newFlightSQLClient(cfg config) (*client, error) {
 	dialOptions, err := grpcDialOptions(cfg)
 	if err != nil {
-		return nil, errors.Join(errors.New("newFlightSQLClient DialOptions"), err)
+		return nil, fmt.Errorf("newFlightSQLClient DialOptions -> %w", err)
 	}
 
 	fsqlClient, err := flightsql.NewClient(cfg.Addr, nil, nil, dialOptions...)

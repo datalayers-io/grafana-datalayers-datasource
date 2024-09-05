@@ -207,7 +207,7 @@ func NewDatasource(ctx context.Context, settings backend.DataSourceInstanceSetti
 	var cfg config
 
 	if err := json.Unmarshal(settings.JSONData, &cfg); err != nil {
-		return nil, errors.Join(errors.New("FlightSQL Config Unmarshal Error"), err)
+		return nil, fmt.Errorf("FlightSQL Config Unmarshal Error -> %w", err)
 	}
 
 	if token, exists := settings.DecryptedSecureJSONData["token"]; exists {
@@ -219,12 +219,12 @@ func NewDatasource(ctx context.Context, settings backend.DataSourceInstanceSetti
 	}
 
 	if err := cfg.validate(); err != nil {
-		return nil, errors.Join(errors.New("FlightSQL Config Validation Error"), err)
+		return nil, fmt.Errorf("FlightSQL Config Validation Error -> ", err)
 	}
 
 	client, err := newFlightSQLClient(cfg)
 	if err != nil {
-		return nil, errors.Join(errors.New("FlightSQL NewDataSource Error"), err)
+		return nil, fmt.Errorf("FlightSQL NewDataSource Error -> %w", err)
 	}
 
 	md := createMetadata(cfg)
@@ -309,7 +309,7 @@ func authenticateClient(ctx context.Context, client *client, cfg config, md meta
 	if len(cfg.Username) > 0 || len(cfg.Password) > 0 {
 		ctx, err := client.FlightClient().AuthenticateBasicToken(ctx, cfg.Username, cfg.Password)
 		if err != nil {
-			return nil, errors.Join(errors.New("FlightSQL Authenticate Error"), err)
+			return nil, fmt.Errorf("FlightSQL Authenticate Error -> %w", err)
 		}
 		authMD, _ := metadata.FromOutgoingContext(ctx)
 		md = metadata.Join(md, authMD)
