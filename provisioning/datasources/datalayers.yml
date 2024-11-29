@@ -6,10 +6,7 @@ datasources:
     uid: 'datalayersio-datasource'
     jsonData:
       host: 'your_host_ip:8360'
-      selectedAuthType: 'username/password'
       username: 'admin'
-      metadata:
-        - database: 'demo'
     secureJsonData:
       password: 'public'
     version: 1

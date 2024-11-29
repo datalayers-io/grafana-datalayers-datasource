@@ -1,17 +1,12 @@
-import React, {useEffect, useState} from 'react'
-import {InlineSwitch, FieldSet, InlineField, SecretInput, Input, InlineFieldRow, InlineLabel, TextArea} from '@grafana/ui'
-import {DataSourcePluginOptionsEditorProps, SelectableValue} from '@grafana/data'
+import React from 'react'
+import {InlineSwitch, FieldSet, InlineField, SecretInput, Input, TextArea} from '@grafana/ui'
+import {DataSourcePluginOptionsEditorProps} from '@grafana/data'
 import {FlightSQLDataSourceOptions, SecureJsonData} from '../types'
 import {
   onHostChange,
   onSecureChange,
   onUsernameChange,
   onPasswordChange,
-  onAuthTypeChange,
-  onKeyChange,
-  onValueChange,
-  addMetaData,
-  removeMetaData,
   onResetPassword,
 } from './utils'
 
@@ -20,31 +15,9 @@ export function ConfigEditor(props: DataSourcePluginOptionsEditorProps<FlightSQL
   const {jsonData} = options
   const {secureJsonData, secureJsonFields} = options
 
-  const [selectedAuthType] = useState<SelectableValue<string>>({
-    value: jsonData?.selectedAuthType,
-    label: jsonData?.selectedAuthType,
-  })
-  const existingMetastate = jsonData?.metadata?.length && jsonData?.metadata?.map((m: any) => ({key: Object.keys(m)[0], value: Object.values(m)[0]}))
-  const [metaDataArr, setMetaData] = useState(existingMetastate || [{key: '', value: ''}])
-  useEffect(() => {
-    onAuthTypeChange(selectedAuthType, options, onOptionsChange)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAuthType])
-
-  useEffect(() => {
-    const {onOptionsChange, options} = props  
-      const mapData = metaDataArr?.map((m: any) => ({[m.key]: m.value}))
-        const jsonData = {
-        ...options.jsonData,
-        metadata: mapData,
-      }
-      onOptionsChange({...options, jsonData})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [metaDataArr])
-
   return (
     <div>
-      <FieldSet label="FlightSQL Connection" width={400}>
+      <FieldSet label="Datalayers Connection" width={400}>
         <InlineField labelWidth={20} label="Host:Port">
           <Input
             width={40}
@@ -78,7 +51,22 @@ export function ConfigEditor(props: DataSourcePluginOptionsEditorProps<FlightSQL
             isConfigured={secureJsonFields?.password}
           ></SecretInput>
         </InlineField>
-        
+        <InlineField labelWidth={20} label="Database">
+          <Input
+            width={40}
+            name="database"
+            type="text"
+            placeholder="database name"
+            onChange={(e) => {
+              const jsonData = {
+                ...options.jsonData,
+                database: e.currentTarget.value,
+              }
+              onOptionsChange({ ...options, jsonData })
+            }}
+            value={jsonData.database || ''}
+          ></Input>
+        </InlineField>
         <InlineField labelWidth={20} label="Require TLS / SSL">
           <InlineSwitch
             label=""
@@ -97,49 +85,6 @@ export function ConfigEditor(props: DataSourcePluginOptionsEditorProps<FlightSQL
           ) : null
         }
         
-      </FieldSet>
-      <FieldSet label="MetaData" width={400}>
-        {metaDataArr?.map((_: any, i: any) => (
-          <InlineFieldRow key={i} style={{flexFlow: 'row'}}>
-            <InlineField labelWidth={20} label="Key">
-              <Input
-                key={i}
-                width={40}
-                name="key"
-                type="text"
-                value={metaDataArr[i]?.key || ''}
-                placeholder="key"
-                onChange={(e) => onKeyChange(e, metaDataArr, i, setMetaData)}
-              ></Input>
-            </InlineField>
-            <InlineField labelWidth={20} label="Value">
-              <Input
-                key={i}
-                width={40}
-                name="value"
-                type="text"
-                value={metaDataArr[i]?.value || ''}
-                placeholder="value"
-                onChange={(e) => onValueChange(e, metaDataArr, i, setMetaData)}
-              ></Input>
-            </InlineField>
-            {i + 1 >= metaDataArr.length && (
-              <InlineLabel as="button" className="" onClick={() => addMetaData(setMetaData, metaDataArr)} width="auto">
-                +
-              </InlineLabel>
-            )}
-            {i > 0 && (
-              <InlineLabel
-                as="button"
-                className=""
-                width="auto"
-                onClick={() => removeMetaData(i, setMetaData, metaDataArr)}
-              >
-                -
-              </InlineLabel>
-            )}
-          </InlineFieldRow>
-        ))}
       </FieldSet>
     </div>
   )
