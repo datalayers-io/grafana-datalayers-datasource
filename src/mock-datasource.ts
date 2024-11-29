@@ -55,8 +55,6 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<FlightSQL
       host: '',
       secure: true,
       username: '',
-      selectedAuthType: '',
-      metadata: [],
     },
     secureJsonFields: {
       token: false,
