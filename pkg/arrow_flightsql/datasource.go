@@ -304,14 +304,6 @@ func route(ds *DataSource) backend.CallResourceHandler {
 // createMetadata creates metadata from config
 func createMetadata(cfg config) metadata.MD {
 	md := metadata.MD{}
-	// TODO(niebayes): skip accessing the metadata when stable.
-	for _, m := range cfg.Metadata {
-		for k, v := range m {
-			if _, ok := md[k]; !ok && k != "" {
-				md.Set(k, v)
-			}
-		}
-	}
 	if cfg.Database != "" {
 		md.Set("database", fmt.Sprintf(cfg.Database))
 	}
