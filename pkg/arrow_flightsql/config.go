@@ -6,12 +6,14 @@ import (
 )
 
 // Config struct to hold datasource configuration
+// TODO(niebayes): remove the Metadata field when stable.
 type config struct {
 	Addr     string              `json:"host"`
 	Metadata []map[string]string `json:"metadata"`
 	Secure   bool                `json:"secure"`
 	Username string              `json:"username"`
 	Password string              `json:"password"`
+	Database string              `json:"database"`
 	Token    string              `json:"token"`
 }
 
