@@ -10,10 +10,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/apache/arrow/go/v12/arrow/array"
-	"github.com/apache/arrow/go/v12/arrow/flight"
-	"github.com/apache/arrow/go/v12/arrow/flight/flightsql"
-	"github.com/apache/arrow/go/v12/arrow/memory"
+	"github.com/apache/arrow/go/v18/arrow/array"
+	"github.com/apache/arrow/go/v18/arrow/flight"
+	"github.com/apache/arrow/go/v18/arrow/flight/flightsql"
+	"github.com/apache/arrow/go/v18/arrow/memory"
 	"github.com/go-chi/chi/v5"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -93,8 +93,10 @@ func (d *DataSource) getTables(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, d.md)
 
+	dbSchemaFilterPattern := d.getDbSchemaFilterPattern()
 	info, err := d.client.GetTables(ctx, &flightsql.GetTablesOpts{
-		TableTypes: []string{"BASE TABLE", "table"},
+		DbSchemaFilterPattern: &dbSchemaFilterPattern,
+		TableTypes:            []string{"TABLE"},
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -123,7 +125,9 @@ func (d *DataSource) getColumns(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, d.md)
+	dbSchemaFilterPattern := d.getDbSchemaFilterPattern()
 	info, err := d.client.GetTables(ctx, &flightsql.GetTablesOpts{
+		DbSchemaFilterPattern:  &dbSchemaFilterPattern,
 		TableNameFilterPattern: &tableName,
 		IncludeSchema:          true,
 	})
@@ -170,6 +174,15 @@ func (d *DataSource) getColumns(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (d *DataSource) getDbSchemaFilterPattern() string {
+	dbSchemaFilterPattern := "%"
+	value := d.md.Get("database")
+	if len(value) > 0 && value[0] != "" {
+		dbSchemaFilterPattern = value[0]
+	}
+	return dbSchemaFilterPattern
 }
 
 func newDataResponse(reader recordReader) backend.DataResponse {
@@ -219,7 +232,7 @@ func NewDatasource(ctx context.Context, settings backend.DataSourceInstanceSetti
 	}
 
 	if err := cfg.validate(); err != nil {
-		return nil, fmt.Errorf("FlightSQL Config Validation Error -> ", err)
+		return nil, fmt.Errorf("FlightSQL Config Validation Error -> %w", err)
 	}
 
 	client, err := newFlightSQLClient(cfg)
@@ -291,12 +304,8 @@ func route(ds *DataSource) backend.CallResourceHandler {
 // createMetadata creates metadata from config
 func createMetadata(cfg config) metadata.MD {
 	md := metadata.MD{}
-	for _, m := range cfg.Metadata {
-		for k, v := range m {
-			if _, ok := md[k]; !ok && k != "" {
-				md.Set(k, v)
-			}
-		}
+	if cfg.Database != "" {
+		md.Set("database", fmt.Sprintf(cfg.Database))
 	}
 	if cfg.Token != "" {
 		md.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.Token))
