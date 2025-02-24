@@ -85,7 +85,7 @@ toMetricFindValue(rsp: DataQueryResponse): MetricFindValue[] {
 
   overrideGrafanaVars(scopedVars: ScopedVars) {
     // Replace time unit to match Datalayers
-    if (scopedVars.__interval.text) {
+    if (scopedVars.__interval && scopedVars.__interval.text) {
       const v = this.replaceTimeUnit(scopedVars.__interval.value);
       scopedVars.__interval.value = v;
     }
