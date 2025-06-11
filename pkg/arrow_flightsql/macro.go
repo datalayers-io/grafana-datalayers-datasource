@@ -29,7 +29,7 @@ func createMacroDateBin(suffix string) sqlutil.MacroFunc {
 		}
 		column := args[0]
 		alias := generateAlias(column, suffix)
-		return fmt.Sprintf("date_bin(interval '%d second', %s, timestamp '1970-01-01T00:00:00Z')%s", int64(query.Interval.Seconds()), column, alias), nil
+		return fmt.Sprintf("date_bin('%d second', %s, timestamp '1970-01-01T00:00:00Z')%s", int64(query.Interval.Seconds()), column, alias), nil
 	}
 }
 
@@ -53,7 +53,7 @@ func macroTimeGroupAlias(query *sqlutil.Query, args []string) (string, error) {
 
 // macroInterval generates the SQL for interval.
 func macroInterval(query *sqlutil.Query, _ []string) (string, error) {
-	return fmt.Sprintf("interval '%d second'", int64(query.Interval.Seconds())), nil
+	return fmt.Sprintf("'%d second'", int64(query.Interval.Seconds())), nil
 }
 
 // macroFrom generates the SQL for the 'from' time range.
